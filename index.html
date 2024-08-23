@@ -411,6 +411,12 @@
                 return;
             }
 
+            if (tomorrowPriority.length === 0) {
+                alert("Please enter at least one task for Tomorrow's Priority.");
+                return;
+            }
+
+
 
             const emailHTML = `
                 <h2>${title}</h2>
