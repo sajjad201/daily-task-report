@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Generate Daily Task Report</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            width: 80%;
+        }
+
+        .form-section {
+            flex: 1;
+            margin-right: 40px;
+        }
+
+        .email-output {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #generateEmail {
+            background-color: #28a745;
+            font-size: 20px;
+            margin-bottom: 40px;
+        }
+
+        #generateEmail:hover {
+            background-color: #218838;
+        }
+
+        #emailContent u {
+            font-size: 12.8px;
+        }
+
+        #emailContent ol {
+            margin-left: 15px;
+            list-style-type: decimal;
+        }
+
+        #emailContent li {
+            margin-bottom: 5px;
+        }
+
+        .task {
+            margin-bottom: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task .details {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .task input,
+        .priorityTask input,
+        .obstacle input {
+            margin-right: 5px;
+            flex-grow: 1;
+        }
+
+        u {
+            text-decoration: underline;
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+
+        h3 {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            /* Add a border above each section */
+            padding-top: 20px;
+        }
+
+        .removeTask,
+        .removePriorityTask,
+        .removeObstacle {
+            background-color: #dc3545;
+            /* Red color for remove buttons */
+        }
+
+        #addTask,
+        #addPriorityTask,
+        #addObstacle {
+            background-color: #17a2b8;
+            /* Teal color for add buttons */
+        }
+
+        .title-row {
+            display: flex;
+            /* Use flexbox for layout */
+            align-items: center;
+            /* Align items vertically */
+        }
+
+        .title-date {
+            flex: 0 0 25%;
+            /* Take up 25% width */
+            margin-right: 10px;
+            /* Add some spacing */
+        }
+
+        .title-input {
+            flex: 1;
+            /* Take up remaining space */
+        }
+
+        .details {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .progress-field,
+        .hours-field {
+            margin-right: 10px;
+            /* Add some spacing between input fields */
+        }
+
+        .task .details>div {
+            /* Target direct child divs within .details */
+            margin-right: 10px;
+            /* Add spacing between the input field divs */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-section">
+            <h2>Generate Daily Task Report</h2>
+            <button id="generateEmail">Generate Email</button>
+
+            <div class="title-row">
+                <div class="title-input">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" value="Daily report summary">
+                </div>
+                <div class="title-date">
+                    <label for="titleDate">Title Date:</label>
+                    <input type="date" id="titleDate" value="">
+                </div>
+            </div> <br>
+
+            <h3>Worked on Today</h3>
+            <div id="tasksContainer">
+                <div class="task">
+                    <input type="text" class="taskName" placeholder="Task Name">
+                    <div class="details">
+                        <div class="progress-field">
+                            <label for="taskProgress">Progress (%):</label>
+                            <input type="number" class="taskProgress" min="0" max="100" placeholder="%">
+                        </div>
+                        <div class="hours-field">
+                            <label for="taskHours">Hours:</label>
+                            <input type="number" class="taskHours" min="1" max="8" placeholder="Hours">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="addTask">Add Another Task</button> <br>
+
+            <h3>Tomorrow's Priority</h3>
+            <div id="tomorrowPriorityContainer">
+                <div class="priorityTask">
+                    <input type="text" class="priorityTaskName" placeholder="Task Name">
+                </div>
+            </div>
+            <button id="addPriorityTask">Add Another Priority</button> <br>
+
+            <h3>Current Obstacles/Questions</h3>
+            <div id="obstaclesContainer">
+                <div class="obstacle">
+                    <input type="text" class="obstacleName" placeholder="Obstacle/Question">
+                </div>
+            </div>
+            <button id="addObstacle">Add Another Obstacle/Question</button> <br>
+        </div>
+
+        <div class="email-output" style="display: none;">
+            <h3>Generated Email:</h3>
+            <div id="emailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const titleDateInput = document.getElementById('titleDate');
+        const titleInput = document.getElementById('title');
+        const tasksContainer = document.getElementById('tasksContainer');
+        const addTaskButton = document.getElementById('addTask');
+        const tomorrowPriorityContainer = document.getElementById('tomorrowPriorityContainer');
+        const addPriorityTaskButton = document.getElementById('addPriorityTask');
+        const obstaclesContainer = document.getElementById('obstaclesContainer');
+        const addObstacleButton = document.getElementById('addObstacle');
+        const generateEmailButton = document.getElementById('generateEmail');
+        const emailContentDiv = document.getElementById('emailContent');
+
+        const initialTaskProgressInput = tasksContainer.querySelector('.taskProgress');
+        const initialTaskHoursInput = tasksContainer.querySelector('.taskHours');
+
+        initialTaskProgressInput.addEventListener('input', () => {
+            if (initialTaskProgressInput.value > 100) {
+                initialTaskProgressInput.value = 100;
+            } else if (initialTaskProgressInput.value < 0) {
+                initialTaskProgressInput.value = 0;
+            }
+        });
+
+        initialTaskHoursInput.addEventListener('input', () => {
+            if (initialTaskHoursInput.value > 8) {
+                initialTaskHoursInput.value = 8;
+            } else if (initialTaskHoursInput.value < 1) {
+                initialTaskHoursInput.value = 1;
+            }
+        });
+
+
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        titleDateInput.value = today;
+        updateTitle();
+
+        titleDateInput.addEventListener('change', updateTitle);
+
+        addTaskButton.addEventListener('click', addTask);
+        addPriorityTaskButton.addEventListener('click', addPriorityTask);
+        addObstacleButton.addEventListener('click', addObstacle);
+        generateEmailButton.addEventListener('click', generateEmail);
+
+        function updateTitle() {
+            const titleDate = new Date(titleDateInput.value);
+            const formattedDate = titleDate.toLocaleDateString('en-GB', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+            titleInput.value = `Daily report summary (${formattedDate})`;
+        }
+
+        function addTask() {
+            const newTask = document.createElement('div');
+            newTask.classList.add('task');
+            newTask.innerHTML = `
+        <input type="text" class="taskName" placeholder="Task Name">
+        <div class="details">
+            <div class="progress-field">
+                <label for="taskProgress">Progress (%):</label>
+                <input type="number" class="taskProgress" min="0" max="100" placeholder="%">
+            </div>
+            <div class="hours-field">
+                <label for="taskHours">Hours:</label>
+                <input type="number" class="taskHours" min="1" max="8" placeholder="Hours">
+            </div>
+            ${tasksContainer.children.length > 0 ? '<button class="removeTask">Remove</button>' : ''} 
+        </div>
+    `;
+
+            tasksContainer.appendChild(newTask);
+
+            if (tasksContainer.children.length > 1) {
+                const removeButton = newTask.querySelector('.removeTask');
+                removeButton.addEventListener('click', () => {
+                    newTask.remove();
+                });
+            }
+
+            // Add input validation
+            const taskProgressInput = newTask.querySelector('.taskProgress');
+            const taskHoursInput = newTask.querySelector('.taskHours');
+
+            taskProgressInput.addEventListener('input', () => {
+                if (taskProgressInput.value > 100) {
+                    taskProgressInput.value = 100; // Cap the value at 100
+                } else if (taskProgressInput.value < 0) {
+                    taskProgressInput.value = 0; // Prevent negative values
+                }
+            });
+
+            taskHoursInput.addEventListener('input', () => {
+                if (taskHoursInput.value > 8) {
+                    taskHoursInput.value = 8;
+                } else if (taskHoursInput.value < 1) {
+                    taskHoursInput.value = 1;
+                }
+            });
+        }
+
+
+        function addPriorityTask() {
+            const newTask = document.createElement('div');
+            newTask.classList.add('priorityTask');
+            newTask.innerHTML = `
+    <input type="text" class="priorityTaskName" placeholder="Task Name">
+    ${tomorrowPriorityContainer.children.length > 0 ? '<button class="removePriorityTask" style="margin-bottom: 10px">Remove</button>' : ''}
+`;
+
+            tomorrowPriorityContainer.appendChild(newTask);
+
+            if (tomorrowPriorityContainer.children.length > 1) {
+                const removeButton = newTask.querySelector('.removePriorityTask');
+                removeButton.addEventListener('click', () => {
+                    newTask.remove();
+                });
+            }
+        }
+
+        function addObstacle() {
+            const newObstacle = document.createElement('div');
+            newObstacle.classList.add('obstacle');
+            newObstacle.innerHTML = `
+    <input type="text" class="obstacleName" placeholder="Obstacle/Question">
+    ${obstaclesContainer.children.length > 0 ? '<button class="removeObstacle" style="margin-bottom: 10px">Remove</button>' : ''}
+`;
+
+            obstaclesContainer.appendChild(newObstacle);
+
+            if (obstaclesContainer.children.length > 1) {
+                const removeButton = newObstacle.querySelector('.removeObstacle');
+                removeButton.addEventListener('click', () => {
+                    newObstacle.remove();
+                });
+            }
+        }
+
+
+        function generateEmail() {
+            const titleDate = new Date(titleDateInput.value);
+            const formattedDate = titleDate.toLocaleDateString('en-GB', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+
+            const title = `${titleInput.value}`;
+            const tasks = getTasks();
+            const tomorrowPriority = getTomorrowPriority();
+            const obstacles = getObstacles();
+            const totalHours = tasks.reduce((sum, task) => sum + parseInt(task.hours), 0);
+
+            if (tasks.length === 0) {
+                alert("Please enter at least one task.");
+                return;
+            }
+
+            if (totalHours > 8) {
+                alert("Total hours exceed 8. Please adjust the task hours.");
+                return;
+            }
+
+
+            const emailHTML = `
+                <h2>${title}</h2>
+                <u>Worked on Today:</u>
+                <ol>
+                    ${tasks.map(task => `
+                        <li style="margin-left:15px">${task.name}<br>
+                            <b>(${task.progress}% completed ---- ${task.hours} Hours)</b>
+                        </li>
+                    `).join('')}
+                </ol>
+
+                <u>Tomorrow's Priority:</u>
+                <ol>
+                    ${tomorrowPriority.map(task => `
+                        <li style="margin-left:15px">${task}</li>
+                    `).join('')}
+                </ol>
+
+                <u>Current Obstacles/Questions:</u>
+                <ol>
+                    ${obstacles.map(obstacle => `
+                        <li style="margin-left:15px">${obstacle}</li>
+                    `).join('')}
+                </ol>
+            `;
+
+            emailContentDiv.innerHTML = emailHTML;
+            const emailOutputSection = document.querySelector('.email-output');
+            emailOutputSection.style.display = 'block';
+
+        }
+
+        function getTasks() {
+            const tasks = [];
+            const taskElements = tasksContainer.querySelectorAll('.task');
+            taskElements.forEach(taskElement => {
+                const name = taskElement.querySelector('.taskName').value;
+                const progress = taskElement.querySelector('.taskProgress').value;
+                const hours = taskElement.querySelector('.taskHours').value;
+                if (name && progress && hours) {
+                    tasks.push({
+                        name,
+                        progress,
+                        hours
+                    });
+                }
+            });
+            return tasks;
+        }
+
+        function getTomorrowPriority() {
+            const tasks = [];
+            const taskElements = tomorrowPriorityContainer.querySelectorAll('.priorityTask');
+            taskElements.forEach(taskElement => {
+                const name = taskElement.querySelector('.priorityTaskName').value;
+                if (name) {
+                    tasks.push(name);
+                }
+            });
+            return tasks;
+        }
+
+        function getObstacles() {
+            const obstacles = [];
+            const obstacleElements = obstaclesContainer.querySelectorAll('.obstacle');
+            obstacleElements.forEach(obstacleElement => {
+                const name = obstacleElement.querySelector('.obstacleName').value;
+                if (name) {
+                    obstacles.push(name);
+                }
+            });
+            return obstacles.length > 0 ? obstacles : ['N/A'];
+        }
+
+        // Initialize with one task, one priority task, and one obstacle
+    </script>
+</body>
+
+</html>
